@@ -1,0 +1,38 @@
+version: '3.1'
+
+services:
+  forex_sl:
+    image: adesh491/forex_sl:1.0
+    restart: unless-stopped
+    environment:
+      TZ: ${TIMEZONE}
+    networks:
+      - forex_bridge
+    ports:
+      - ${FOREX_SL_PORT}:8080
+    depends_on:
+      - db
+  db:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      TZ: ${TIMEZONE}
+      DB_NAME: ${DB_NAME}
+    networks:
+      - forex_bridge
+    ports:
+      - ${POSTGRES_PORT}:5432
+    volumes:
+      - db-data:/var/lib/postgres/data
+      - db-config:/etc/postgres/config
+    mem_limit: 1500MB
+
+volumes:
+  db-data:
+  db-config:
+
+networks:
+  forex_bridge:
+    driver: bridge
